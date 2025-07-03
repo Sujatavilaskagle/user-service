@@ -9,19 +9,19 @@ router.get('/', async (req, res) => {
   try {
     const userId = getUserId();
     if (!userId) {
-      return res.status(401).json({ error: false, message: 'User not logged in' });
+      return res.status(401).json({ error: true, message: 'User not logged in' });
     }
 
     const profile = await Profile.findByPk(userId);
 
     if (!profile) {
-      return res.status(404).json({ error: false, message: 'Profile not found' });
+      return res.status(404).json({ error: true, message: 'Profile not found' });
     }
 
-    return res.status(200).json({ error: true, profile });
+    return res.status(200).json({ error: false, profile });
   } catch (error) {
     console.error('Error fetching profile:', error.message);
-    return res.status(500).json({ error: false, message: 'Internal server error' });
+    return res.status(500).json({ error: true, message: 'Internal server error' });
   }
 });
 
@@ -30,7 +30,7 @@ router.put('/', async (req, res) => {
   try {
     const userId = getUserId();
     if (!userId) {
-      return res.status(401).json({ success: false, message: 'User not logged in' });
+      return res.status(401).json({ error: true, message: 'User not logged in' });
     }
 
     const [profile] = await Profile.upsert(
@@ -41,13 +41,13 @@ router.put('/', async (req, res) => {
     await produceEvent('user.updated', profile);
 
     return res.status(200).json({
-      error: true,
+      error: false,
       message: 'Profile updated successfully',
       profile,
     });
   } catch (error) {
     console.error('Error updating profile:', error.message);
-    return res.status(500).json({ success: false, message: 'Failed to update profile' });
+    return res.status(500).json({ error: true, message: 'Failed to update profile' });
   }
 });
 

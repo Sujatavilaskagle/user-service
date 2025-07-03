@@ -1,21 +1,15 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
-const { v4: uuidv4 } = require('uuid');
 
 const Address = sequelize.define('Address', {
   addressId: {
     type: DataTypes.UUID,
-    defaultValue: uuidv4,
+    defaultValue: DataTypes.UUIDV4, // Use Sequelize's built-in UUID generator
     primaryKey: true,
   },
   userId: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: {
-      model: 'users', // ✅ reference the users table
-      key: 'userId',
-    },
-    onDelete: 'CASCADE',
   },
   address: {
     type: DataTypes.STRING,
@@ -39,7 +33,9 @@ const Address = sequelize.define('Address', {
   },
 }, {
   tableName: 'addresses',
-  timestamps: false,
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: false,
 });
 
 module.exports = Address;
