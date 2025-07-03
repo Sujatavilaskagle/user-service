@@ -9,14 +9,14 @@ router.get('/', async (req, res) => {
   try {
     const userId = getUserId();
     if (!userId) {
-      return res.status(401).json({ success: false, message: 'User not logged in' });
+      return res.status(401).json({ error: false, message: 'User not logged in' });
     }
 
     const addresses = await Address.findAll({ where: { userId } });
-    res.status(200).json({ success: true, addresses });
+    res.status(200).json({ error: true, addresses });
   } catch (error) {
     console.error('Error fetching addresses:', error.message);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ error: false, message: 'Internal server error' });
   }
 });
 
@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
   try {
     const userId = getUserId();
     if (!userId) {
-      return res.status(401).json({ success: false, message: 'User not logged in' });
+      return res.status(401).json({ error: false, message: 'User not logged in' });
     }
 
     const address = await Address.create({
@@ -35,10 +35,10 @@ router.post('/', async (req, res) => {
 
     await produceEvent('user.address.added', address);
 
-    res.status(201).json({ success: true, message: 'Address added', address });
+    res.status(201).json({ error: true, message: 'Address added', address });
   } catch (error) {
     console.error('Error adding address:', error.message);
-    res.status(500).json({ success: false, message: 'Failed to add address' });
+    res.status(500).json({ error: false, message: 'Failed to add address' });
   }
 });
 
