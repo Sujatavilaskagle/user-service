@@ -1,5 +1,7 @@
 const { Kafka } = require('kafkajs');
 require('dotenv').config();
+const { setUserId } = require('../state/userContext');
+
 
 const kafka = new Kafka({
   clientId: 'user-service-consumer',
@@ -25,10 +27,14 @@ const startConsumer = async () => {
       eachMessage: async ({ topic, partition, message }) => {
         const payload = JSON.parse(message.value.toString());
 
-        if (topic === 'user.registered') {
-          console.log('✅ [REGISTER] Received:', payload);
-          // Handle registration logic here
-        } else if (topic === 'user.loggedin') {
+        if (topic === 'user.loggedin') {
+  console.log(' [LOGIN] Received:', payload);
+  if (payload.userId) {
+    setUserId(payload.userId);
+    console.log('🔐 Logged-in User ID stored:', payload.userId);
+  }
+}
+else if (topic === 'user.loggedin') {
           console.log('✅ [LOGIN] Received:', payload);
           // Handle login logic here
         } else {
