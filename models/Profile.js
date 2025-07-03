@@ -1,13 +1,33 @@
-const mongoose = require('mongoose');
-const { v4: uuid } = require('uuid');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const ProfileSchema = new mongoose.Schema({
-  userId: { type: String, default: uuid, unique: true },
-  name: String,
-  mobile: String,
-  dob: String,
-  gender: String,
-  created_at: { type: Date, default: Date.now }
+const Profile = sequelize.define('Profile', {
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  mobile: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  dob: {
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  gender: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+}, {
+  tableName: 'profiles',
+  timestamps: true,           // adds createdAt + updatedAt
+  createdAt: 'created_at',    // rename to match your schema
+  updatedAt: false,           // disable updatedAt if not needed
 });
 
-module.exports = mongoose.model('Profile', ProfileSchema);
+module.exports = Profile;

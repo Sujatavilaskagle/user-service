@@ -2,22 +2,44 @@ const express = require('express');
 const router = express.Router();
 const Address = require('../models/Address');
 const produceEvent = require('../kafka/producer');
+const { getUserId } = require('../state/userContext');
 
-const DUMMY_USER_ID = process.env.DUMMY_USER_ID;
-
+// GET /user/address
 router.get('/', async (req, res) => {
-  const addresses = await Address.find({ userId: DUMMY_USER_ID });
-  res.json(addresses);
+  try {
+    const userId = getUserId();
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User not logged in' });
+    }
+
+    const addresses = await Address.findAll({ where: { userId } });
+    res.status(200).json({ success: true, addresses });
+  } catch (error) {
+    console.error('Error fetching addresses:', error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
 });
 
+// POST /user/address
 router.post('/', async (req, res) => {
-  const address = new Address({
-    ...req.body,
-    userId: DUMMY_USER_ID,
-  });
-  await address.save();
-  await produceEvent('user.address.added', address);
-  res.json(address);
+  try {
+    const userId = getUserId();
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'User not logged in' });
+    }
+
+    const address = await Address.create({
+      ...req.body,
+      userId,
+    });
+
+    await produceEvent('user.address.added', address);
+
+    res.status(201).json({ success: true, message: 'Address added', address });
+  } catch (error) {
+    console.error('Error adding address:', error.message);
+    res.status(500).json({ success: false, message: 'Failed to add address' });
+  }
 });
 
 module.exports = router;

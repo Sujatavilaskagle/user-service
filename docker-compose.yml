@@ -20,3 +20,17 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
     depends_on:
       - zookeeper
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: semicon
+      POSTGRES_USER: semicon
+      POSTGRES_PASSWORD: semicon
+    ports:
+      - "3502:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
